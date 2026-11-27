@@ -107,22 +107,6 @@ class BrailleDisplayDriver(_BrailleDisplayDriver):
 	gestureMap = _gestureMap
 
 	@classmethod
-	def check(cls) -> bool:
-		"""Return whether a Star Braille display is currently connected."""
-		try:
-			if device.has_device():
-				return True
-		except Exception:
-			log.debugWarning("Could not enumerate Star Braille displays", exc_info=True)
-		# Also let bdDetect match the registered USB ID, in case the device
-		# interface class cannot be enumerated for some reason.
-		try:
-			return super().check()
-		except Exception:
-			log.debugWarning("bdDetect check for Star Braille failed", exc_info=True)
-			return False
-
-	@classmethod
 	def registerAutomaticDetection(cls, driverRegistrar: bdDetect.DriverRegistrar) -> None:
 		"""Let NVDA's automatic detection find the display by its USB ID."""
 		# addUsbDevice was added in NVDA 2025.1.
