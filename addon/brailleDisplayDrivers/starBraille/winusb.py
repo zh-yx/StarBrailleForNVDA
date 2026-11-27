@@ -13,6 +13,9 @@ GENERIC_READ = 0x80000000
 GENERIC_WRITE = 0x40000000
 OPEN_EXISTING = 3
 FILE_SHARE_NONE = 0
+FILE_SHARE_READ = 1
+FILE_SHARE_WRITE = 2
+FILE_SHARE_READ_WRITE = FILE_SHARE_READ | FILE_SHARE_WRITE
 FILE_ATTRIBUTE_NORMAL = 0x80
 # WinUsb_Initialize requires an overlapped handle on current Windows versions,
 # even though the calls below pass a NULL OVERLAPPED and therefore complete synchronously.
@@ -88,7 +91,7 @@ winusb.WinUsb_WritePipe.restype = wintypes.BOOL
 
 
 class WinUsbDevice:
-	"""An exclusively opened WinUSB bulk interface."""
+	"""A WinUSB bulk interface opened with shared read/write access."""
 
 	def __init__(self, path: str, endpoint_in: int, endpoint_out: int, timeout_ms: int = 500):
 		self.path = path
@@ -110,12 +113,12 @@ class WinUsbDevice:
 			if self._interface:
 				return
 
-			# Share mode 0: the display is opened exclusively, as required by the protocol.
+			# Shared read/write mode: allow other handles to share the device for reading and writing.
 			# The handle must be overlapped for WinUsb_Initialize; a NULL OVERLAPPED is passed to each transfer.
 			handle = kernel32.CreateFileW(
 				self.path,
 				GENERIC_READ | GENERIC_WRITE,
-				FILE_SHARE_NONE,
+				FILE_SHARE_READ_WRITE,
 				None,
 				OPEN_EXISTING,
 				FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED,
