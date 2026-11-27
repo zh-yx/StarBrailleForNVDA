@@ -37,14 +37,18 @@ DESCRIPTION = "Star Braille Display"
 # Right pair: button4 (ID 44), button5 (ID 45).
 # Left to right across the device:
 # button1, button2, button3, button6, button5, button4.
-# Button id -> (neutral gesture id, default NVDA command).
+#
+# Button id -> (semantic gesture id, default NVDA command).
+# The line and screen navigation keys use semantic gesture ids because their
+# default functions are fixed. buttonLeft and buttonRight are neutral,
+# user-customizable keys; their default commands are only initial defaults.
 _BUTTON_ACTIONS = {
-	41: ("button1", "braille_previousLine"),
-	42: ("button2", "braille_scrollBack"),
-	43: ("button3", "kb:tab"),
-	44: ("button4", "braille_nextLine"),
-	45: ("button5", "braille_scrollForward"),
-	46: ("button6", "kb:enter"),
+	41: ("previousLine", "braille_previousLine"),
+	42: ("previousScreen", "braille_scrollBack"),
+	43: ("buttonLeft", "kb:tab"),
+	44: ("nextLine", "braille_nextLine"),
+	45: ("nextScreen", "braille_scrollForward"),
+	46: ("buttonRight", "kb:enter"),
 }
 
 _HAS_CELL_INDEXES = hasattr(BrailleDisplayGesture, "cellIndexes")
@@ -77,8 +81,9 @@ class ButtonGesture(StarBrailleGesture):
 
 
 # Routing keys use the standard braille_routeTo script.  The six function keys
-# get neutral names so that they can be remapped in NVDA's Input Gestures
-# dialog without implying a fixed function.
+# use semantic gesture ids: previousLine/previousScreen/nextLine/nextScreen for
+# the fixed navigation keys, and buttonLeft/buttonRight for the two keys whose
+# default commands can be remapped by users in NVDA's Input Gestures dialog.
 _gestureMap = inputCore.GlobalGestureMap(
 	{
 		"globalCommands.GlobalCommands": {
